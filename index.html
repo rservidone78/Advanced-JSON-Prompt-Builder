@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Advanced JSON Prompt Builder — Full Options + Editable Presets</title>
+<style>
+  :root{
+    --bg:#f0f4f8; --fg:#111; --accent:#007bff; --card:#fff; --muted:#666; --green:#28a745;
+  }
+  body.dark-mode{ --bg:#151516; --fg:#eaeaea; --card:#222; --muted:#a0a0a0; --accent:#4da6ff; --green:#2db04a; }
+  body{ background:var(--bg); color:var(--fg); font-family:Roboto, sans-serif; max-width:1200px; margin:18px auto; padding:18px; }
+  h1{ font-family:Orbitron, sans-serif; color:var(--accent); text-align:center; }
+  p { text-align:center; margin-top:6px; color:var(--muted); }
+  form{ background:linear-gradient(135deg,var(--card),var(--bg)); padding:16px; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.06); display:grid; gap:12px; }
+  label{ font-weight:700; display:block; margin-bottom:6px; }
+  select,input[type="text"],textarea{ width:100%; padding:10px; border-radius:8px; border:1px solid #d1d1d1; box-sizing:border-box; background:var(--card); color:var(--fg); }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .three-col{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+  .small{ font-size:13px; padding:8px 10px; border-radius:8px; background:var(--accent); color:#fff; border:none; cursor:pointer; }
+  .small.secondary{ background:#6c757d; }
+  .small.danger{ background:#dc3545; }
+  .small.green{ background:var(--green); }
+  .section{ margin-top:10px; }
+  .card{ border:1px solid #e1e1e1; padding:10px; border-radius:8px; background:transparent; }
+  .row{ display:flex; gap:8px; align-items:center; }
+  .muted{ color:var(--muted); font-size:13px; }
+  textarea.output{ min-height:120px; font-family:monospace; }
+  .preset-list{ display:grid; gap:8px; max-height:220px; overflow:auto; border:1px solid #e1e1e1; padding:8px; border-radius:8px; background:var(--card); }
+  .preset-item{ display:flex;
+  gap:8px;
+  align-items:flex-start;
+  border:1px solid #ddd;
+  padding:8px;
+  border-radius:8px;
+  background: linear-gradient(180deg, #f0f0f0, #e0e0e0); /* light-mode gray */
+}
+
+/* dark-mode override */
+body.dark-mode .preset-item{
+  background: linear-gradient(180deg, #2a2a2a, #222); /* dark gray / near black */
+  border-color: #333; }
+  .preset-item .meta{ flex:1; }
+  .preset-item input[type="text"]{ margin-bottom:6px; }
+  .btn-row{ display:flex; gap:6px; }
+  #generateBtn{ background:var(--green); color:white; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+  #theme-toggle{ position:fixed; right:18px; top:18px; padding:8px 12px; border-radius:8px; border:none; background:var(--accent); color:#fff; cursor:pointer; }
+  @media (max-width:900px){ .two-col{ grid-template-columns:1fr } .three-col{ grid-template-columns:1fr } }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body class="dark-mode">
+<button id="theme-toggle">Toggle Light Mode</button>
+<h1>Advanced JSON Prompt Builder</h1>
+<h1>by Rob Servidone</h1>
+<p>All categories restored. Edit presets inline, add custom categories, animals, objects, then generate JSON or convert to text.</p>
+
+<!-- Turn off browser autofill / past-input popups -->
+<form id="promptForm" onsubmit="return false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <!-- Setting (expanded) -->
+  <label for="setting">Setting (Scene Location):</label>
+  <select id="setting" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="a quiet urban street bathed in early morning sunlight">Quiet urban street</option>
+    <option value="a dense forest with sunlight filtering through trees">Dense forest</option>
+    <option value="a sandy beach at sunset">Sandy beach</option>
+    <option value="a futuristic cityscape at night">Futuristic cityscape</option>
+    <option value="a cozy indoor library">Cozy library</option>
+    <option value="a bustling market in an ancient city">Bustling ancient market</option>
+    <option value="a snowy mountain peak during a blizzard">Snowy mountain peak</option>
+    <option value="an abandoned warehouse in the industrial district">Abandoned warehouse</option>
+    <option value="a serene countryside farm at dawn">Serene countryside farm</option>
+    <option value="a high-tech laboratory filled with gadgets">High-tech laboratory</option>
+    <option value="an underwater coral reef full of colorful fish">Underwater coral reef</option>
+    <option value="a crowded subway station during rush hour">Crowded subway station</option>
+    <option value="an old Victorian house on a foggy hill">Victorian house</option>
+    <option value="a neon-lit alley in a rainy cyberpunk district">Neon-lit cyberpunk alley</option>
+    <option value="a rooftop garden overlooking a metropolis">Rooftop garden</option>
+    <option value="an airport terminal with planes taking off">Airport terminal</option>
+    <option value="a medieval castle courtyard">Medieval castle courtyard</option>
+    <option value="a desert highway stretching to the horizon">Desert highway</option>
+    <option value="a carnival at night with bright lights">Carnival at night</option>
+    <option value="an ice cave with crystalline formations">Ice cave</option>
+    <option value="a suburban backyard BBQ">Suburban backyard</option>
+    <option value="a hospital emergency room">Hospital emergency room</option>
+    <option value="a classroom full of students">Classroom</option>
+    <option value="a police station interrogation room">Police interrogation room</option>
+    <option value="a moonlit cliff overlooking the ocean">Moonlit cliff</option>
+    <option value="a space station corridor">Space station corridor</option>
+    <option value="a pirate ship deck during a storm">Pirate ship deck</option>
+    <option value="a botanical greenhouse with fog">Botanical greenhouse</option>
+    <option value="a music concert stage with smoke and lights">Concert stage</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_setting" placeholder="Selected or custom settings (comma-separated)">
+
+  <label for="scene_description">What happens in this scene?</label>
+  <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="scene_description" rows="3" placeholder="Describe the action or events in the scene..."></textarea>
+
+  <!-- presets manager (inline editable) -->
+  <div class="section">
+    <label>Presets (inline editable)</label>
+    <div class="row" style="gap:8px;">
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="new_preset_name" placeholder="Preset name (save current environment)"/>
+      <button class="small" onclick="savePresetAsNew()">Save Current as New Preset</button>
+    </div>
+    <div class="preset-list" id="presetsContainer" aria-live="polite"></div>
+  </div>
+
+  <!-- Day / Part of day -->
+  <div class="two-col">
+    <div>
+      <label for="day_night">Day / Night</label>
+      <select id="day_night" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="day">Day</option>
+        <option value="night">Night</option>
+        <option value="twilight">Twilight</option>
+        <option value="blue hour">Blue hour</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_daynight" placeholder="Selected or custom day/night">
+    </div>
+
+    <div>
+      <label for="part_of_day">Part of Day</label>
+      <select id="part_of_day" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="dawn">Dawn</option>
+        <option value="early morning">Early morning</option>
+        <option value="morning">Morning</option>
+        <option value="late morning">Late morning</option>
+        <option value="noon">Noon</option>
+        <option value="early afternoon">Early afternoon</option>
+        <option value="afternoon">Afternoon</option>
+        <option value="late afternoon">Late afternoon</option>
+        <option value="golden hour">Golden hour</option>
+        <option value="sunset">Sunset</option>
+        <option value="dusk">Dusk</option>
+        <option value="evening">Evening</option>
+        <option value="midnight">Midnight</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_partofday" placeholder="Selected or custom part of day">
+    </div>
+  </div>
+
+  <!-- Weather and Effects -->
+  <div class="two-col">
+    <div>
+      <label for="weather">Weather</label>
+      <select id="weather" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="clear sky">Clear</option>
+        <option value="sunny">Sunny</option>
+        <option value="partly cloudy">Partly cloudy</option>
+        <option value="overcast">Overcast</option>
+        <option value="light rain">Light rain / drizzle</option>
+        <option value="heavy rain">Heavy rain</option>
+        <option value="thunderstorm">Thunderstorm</option>
+        <option value="fog">Fog</option>
+        <option value="mist">Mist</option>
+        <option value="haze">Haze</option>
+        <option value="snow">Snow</option>
+        <option value="blizzard">Blizzard</option>
+        <option value="sleet">Sleet</option>
+        <option value="windy">Windy</option>
+        <option value="stormy">Stormy</option>
+        <option value="drizzle">Drizzle</option>
+        <option value="light showers">Light showers</option>
+        <option value="rain with sun">Rain with sun</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_weather" placeholder="Selected or custom weather">
+    </div>
+    <div>
+      <label for="effects">Effects (visual / post)</label>
+      <select id="effects" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="film grain">Film grain</option>
+        <option value="lens flare">Lens flare</option>
+        <option value="bokeh highlights">Bokeh highlights</option>
+        <option value="motion blur">Motion blur</option>
+        <option value="depth of field (shallow)">Shallow DOF</option>
+        <option value="depth of field (deep)">Deep DOF</option>
+        <option value="vignette">Vignette</option>
+        <option value="chromatic aberration">Chromatic aberration</option>
+        <option value="light leaks">Light leaks</option>
+        <option value="color grading warm">Color grading (warm)</option>
+        <option value="color grading cool">Color grading (cool)</option>
+        <option value="high contrast">High contrast</option>
+        <option value="desaturated">Desaturated</option>
+        <option value="glitch / digital artifact">Glitch / digital artifact</option>
+        <option value="double exposure">Double exposure</option>
+        <option value="slow shutter streaks">Slow shutter streaks</option>
+        <option value="rain on lens">Rain droplets on lens</option>
+        <option value="fog haze">Fog haze</option>
+        <option value="smoke / steam particles">Smoke / steam</option>
+        <option value="snow particles">Snow particles</option>
+        <option value="dust / sand">Dust / sand</option>
+        <option value="spark particles">Spark particles</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_effects" placeholder="Selected or custom effects">
+    </div>
+  </div>
+
+  <!-- Custom (multiple) categories -->
+  <div class="section">
+    <label>Custom Categories (Other) — add multiple named categories</label>
+    <div id="custom-categories-container" class="card"></div>
+    <div class="row">
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="new_custom_name" placeholder="Category name (e.g., props)"/>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="new_custom_values" placeholder="values, comma-separated"/>
+      <button class="small" onclick="handleAddCustomCategory()">Add Category</button>
+    </div>
+    <div class="muted">Each custom category will be included in the generated JSON with the name you provide.</div>
+  </div>
+
+  <!-- Camera movement (restored full list) -->
+  <label for="camera_movement">Camera Movement</label>
+  <select id="camera_movement" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="smooth Steadicam walk-along, slight handheld bounce for naturalistic rhythm">Smooth Steadicam walk-along</option>
+    <option value="slow pan left across the scene">Slow pan left</option>
+    <option value="slow pan right across the scene">Slow pan right</option>
+    <option value="gradual zoom in on the subject">Gradual zoom in</option>
+    <option value="slow push in/dolly in">Dolly in</option>
+    <option value="slow pull out/dolly out">Dolly out</option>
+    <option value="quick dolly zoom for dramatic effect">Dolly zoom</option>
+    <option value="static shot with no movement">Static shot</option>
+    <option value="tracking shot following movement">Tracking shot</option>
+    <option value="handheld for realistic shake">Handheld</option>
+    <option value="aerial drone flyover">Aerial drone</option>
+    <option value="crane up for elevation">Crane up</option>
+    <option value="crane down for descent">Crane down</option>
+    <option value="whip pan for fast transition">Whip pan</option>
+    <option value="arc shot circling subject">Arc shot</option>
+    <option value="orbit around subject">Orbit</option>
+    <option value="parallax shift for depth">Parallax</option>
+    <option value="tilt up to reveal height">Tilt up</option>
+    <option value="tilt down to show depth">Tilt down</option>
+    <option value="push in for emphasis">Push in</option>
+    <option value="pull out for reveal">Pull out</option>
+    <option value="rack focus shift">Rack focus</option>
+    <option value="boom shot vertical movement">Boom shot</option>
+    <option value="jib arm sweep">Jib arm sweep</option>
+    <option value="arc shot circling subject">Arc shot</option>
+    <option value="orbit shot">Orbit</option>
+    <option value="handheld with steady nods">Handheld (steady)</option>
+    <option value="gimbal stabilized move">Gimbal stabilized</option>
+    <option value="timelapse motion">Timelapse motion</option>
+    <option value="slow motion tracking">Slow motion tracking</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_camera_movement" placeholder="Selected or custom camera movements (comma-separated)">
+
+  <!-- Camera angle (restored large list) -->
+  <label for="camera_angle">Camera Angle</label>
+  <select id="camera_angle" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="establishing shot">Establishing shot</option>
+    <option value="extreme long shot">Extreme long shot</option>
+    <option value="long shot">Long shot</option>
+    <option value="wide shot">Wide shot</option>
+    <option value="full shot">Full shot</option>
+    <option value="medium shot">Medium shot</option>
+    <option value="cowboy shot">Cowboy shot</option>
+    <option value="two shot">Two shot</option>
+    <option value="medium close-up">Medium close-up</option>
+    <option value="close-up">Close-up</option>
+    <option value="extreme close-up">Extreme close-up</option>
+    <option value="eye level shot">Eye level shot</option>
+    <option value="shoulder level shot">Shoulder level shot</option>
+    <option value="hip level shot">Hip level shot</option>
+    <option value="high angle shot">High angle shot</option>
+    <option value="low angle shot">Low angle shot</option>
+    <option value="overhead shot">Overhead shot</option>
+    <option value="bird's eye view">Bird's eye view</option>
+    <option value="aerial shot">Aerial shot</option>
+    <option value="dutch angle">Dutch angle</option>
+    <option value="tilt shot">Tilt shot</option>
+    <option value="over-the-shoulder shot">Over-the-shoulder shot</option>
+    <option value="point-of-view shot">Point-of-view shot</option>
+    <option value="tracking shot">Tracking shot</option>
+    <option value="master shot">Master shot</option>
+    <option value="low wide angle">Low wide angle</option>
+    <option value="eye-level close-up">Eye-level close-up</option>
+    <option value="worm's-eye view">Worm's-eye view</option>
+    <option value="iso shot">ISO shot</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_camera_angle" placeholder="Selected or custom camera angles (comma-separated)">
+
+  <!-- NEW: Lens Type -->
+  <label for="lens_type">Lens Type</label>
+  <select id="lens_type" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="prime lens (fixed focal length)">Prime (fixed focal length)</option>
+    <option value="standard/normal lens (50mm equivalent)">Standard / Normal</option>
+    <option value="wide-angle lens (e.g., 24mm, 28mm)">Wide-angle</option>
+    <option value="ultra-wide lens (e.g., 14mm)">Ultra-wide</option>
+    <option value="fisheye lens">Fisheye</option>
+    <option value="telephoto lens (e.g., 85mm, 200mm)">Telephoto</option>
+    <option value="super-telephoto lens (300mm+)">Super-telephoto</option>
+    <option value="zoom lens (variable focal length)">Zoom</option>
+    <option value="portrait lens (85mm prime style)">Portrait</option>
+    <option value="macro lens (close-up capabilities)">Macro</option>
+    <option value="anamorphic lens (cinematic squeeze)">Anamorphic</option>
+    <option value="tilt-shift lens (selective focus)">Tilt-shift</option>
+    <option value="pancake lens (compact low-profile)">Pancake</option>
+    <option value="retrofocus wide-angle">Retrofocus wide-angle</option>
+    <option value="soft-focus lens">Soft-focus</option>
+    <option value="tele-converter attached">Tele-converter attached</option>
+    <option value="cine lens (geared focus, de-clicked aperture)">Cine lens</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_lens_type" placeholder="Selected or custom lens types (comma-separated)">
+
+  <!-- NEW: Aspect Ratio -->
+  <label for="aspect_ratio">Aspect Ratio</label>
+  <select id="aspect_ratio" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="1:1 (square)">1:1 — Square</option>
+    <option value="4:3 (classic TV / photo)">4:3</option>
+    <option value="3:2 (35mm still photography)">3:2</option>
+    <option value="16:9 (widescreen video / HDTV)">16:9</option>
+    <option value="1.85:1 (academy / widescreen)">1.85:1</option>
+    <option value="2.39:1 (anamorphic cinema widescreen)">2.39:1</option>
+    <option value="2.35:1 (cinematic widescreen)">2.35:1</option>
+    <option value="2:1 (social / cinematic mid-widescreen)">2:1</option>
+    <option value="2.4:1 (modern anamorphic standard)">2.4:1</option>
+    <option value="21:9 (ultra-wide / cinematic)">21:9</option>
+    <option value="9:16 (vertical mobile video)">9:16 — Vertical</option>
+    <option value="4:5 (portrait crop for social)">4:5</option>
+    <option value="3:1 (panoramic)">3:1 — Panoramic</option>
+    <option value="5:4 (medium-format feel)">5:4</option>
+    <option value="Custom (enter ratio)">Custom</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_aspect_ratio" placeholder="Selected or custom aspect ratios (comma-separated)">
+
+  <!-- Genre (restored) -->
+  <label for="genre">Genre</label>
+  <select id="genre" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="action">Action</option>
+    <option value="adventure">Adventure</option>
+    <option value="animation">Animation</option>
+    <option value="biography">Biography</option>
+    <option value="comedy">Comedy</option>
+    <option value="crime">Crime</option>
+    <option value="documentary">Documentary</option>
+    <option value="drama">Drama</option>
+    <option value="family">Family</option>
+    <option value="fantasy">Fantasy</option>
+    <option value="film-noir">Film-Noir</option>
+    <option value="history">History</option>
+    <option value="horror">Horror</option>
+    <option value="musical">Musical</option>
+    <option value="mystery">Mystery</option>
+    <option value="romance">Romance</option>
+    <option value="sci-fi">Sci-Fi</option>
+    <option value="short">Short</option>
+    <option value="sport">Sport</option>
+    <option value="superhero">Superhero</option>
+    <option value="suspense">Suspense</option>
+    <option value="thriller">Thriller</option>
+    <option value="war">War</option>
+    <option value="western">Western</option>
+    <option value="martial-arts">Martial Arts</option>
+    <option value="gangster">Gangster</option>
+    <option value="spy">Spy</option>
+    <option value="epic">Epic</option>
+    <option value="experimental">Experimental</option>
+    <option value="neo-noir">Neo-Noir</option>
+    <option value="mockumentary">Mockumentary</option>
+    <option value="satire">Satire</option>
+    <option value="slasher">Slasher</option>
+    <option value="steampunk">Steampunk</option>
+    <option value="cyberpunk">Cyberpunk</option>
+    <option value="dystopian">Dystopian</option>
+    <option value="utopian">Utopian</option>
+    <option value="post-apocalyptic">Post-Apocalyptic</option>
+    <option value="supernatural">Supernatural</option>
+    <option value="psychological-thriller">Psychological Thriller</option>
+    <option value="coming-of-age">Coming-of-Age</option>
+    <option value="road-movie">Road Movie</option>
+    <option value="heist">Heist</option>
+    <option value="space-opera">Space Opera</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_genre" placeholder="Selected or custom genres (comma-separated)">
+
+  <!-- Style (restored) -->
+  <label for="style">Style</label>
+  <select id="style" autocomplete="off">
+    <option value="">Select to add...</option>
+    <option value="cinematic with high production values">Cinematic</option>
+    <option value="realistic and photorealistic">Realistic</option>
+    <option value="animated in 2D style">Animated 2D</option>
+    <option value="documentary with raw footage feel">Documentary</option>
+    <option value="surreal and abstract">Surreal</option>
+    <option value="expressionistic with bold contrasts">Expressionistic</option>
+    <option value="naturalistic and unfiltered">Naturalistic</option>
+    <option value="stylized and artistic">Stylized</option>
+    <option value="film-noir with shadows and mystery">Film Noir</option>
+    <option value="impressionistic with soft focus">Impressionistic</option>
+    <option value="hyper-realistic with fine details">Hyper-Realistic</option>
+    <option value="vintage with retro aesthetics">Vintage</option>
+    <option value="minimalist with simple compositions">Minimalist</option>
+    <option value="baroque with ornate details">Baroque</option>
+    <option value="gothic with dark elements">Gothic</option>
+    <option value="futuristic with high-tech visuals">Futuristic</option>
+    <option value="cartoonish with exaggerated features">Cartoonish</option>
+    <option value="abstract with non-representational forms">Abstract</option>
+    <option value="romantic with soft lighting">Romantic</option>
+    <option value="epic with grand scales">Epic</option>
+    <option value="gritty and raw">Gritty</option>
+    <option value="dreamlike and ethereal">Dreamlike</option>
+    <option value="satirical with ironic visuals">Satirical</option>
+    <option value="horror with eerie effects">Horror</option>
+    <option value="comedic with bright colors">Comedic</option>
+  </select>
+  <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_style" placeholder="Selected or custom styles (comma-separated)">
+
+  <!-- Lighting, Mood, Music (kept expanded) -->
+  <div class="three-col">
+    <div>
+      <label for="lighting">Lighting</label>
+      <select id="lighting" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="natural golden-hour lighting with soft HDR bounce">Golden-hour natural</option>
+        <option value="dim and moody with shadows">Dim and moody</option>
+        <option value="bright and even daylight">Bright daylight</option>
+        <option value="neon lights in dark environment">Neon lights</option>
+        <option value="soft indoor lighting with warm tones">Soft indoor</option>
+        <option value="high-key with minimal shadows">High-key</option>
+        <option value="low-key with deep shadows">Low-key</option>
+        <option value="hard lighting for sharp contrasts">Hard lighting</option>
+        <option value="soft lighting for diffused effects">Soft lighting</option>
+        <option value="backlighting for silhouettes">Backlighting</option>
+        <option value="sidelighting for dramatic contours">Sidelighting</option>
+        <option value="top lighting for overhead emphasis">Top lighting</option>
+        <option value="bottom lighting for eerie effects">Bottom lighting</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_lighting" placeholder="Selected or custom lightings (comma-separated)">
+    </div>
+
+    <div>
+      <label for="mood">Mood (Tone)</label>
+      <select id="mood" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="playful, stylish, vibrant">Playful and vibrant</option>
+        <option value="serious and intense">Serious and intense</option>
+        <option value="mysterious and eerie">Mysterious</option>
+        <option value="joyful and uplifting">Joyful</option>
+        <option value="melancholic and reflective">Melancholic</option>
+        <option value="tense and suspenseful">Tense</option>
+        <option value="serene and peaceful">Serene</option>
+        <option value="chaotic and frantic">Chaotic</option>
+        <option value="nostalgic and wistful">Nostalgic</option>
+        <option value="ominous and foreboding">Ominous</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_mood" placeholder="Selected or custom moods (comma-separated)">
+    </div>
+
+    <div>
+      <label for="music">Music</label>
+      <select id="music" autocomplete="off">
+        <option value="">Select to add...</option>
+        <option value="orchestral">Orchestral</option>
+        <option value="classical">Classical</option>
+        <option value="jazz">Jazz</option>
+        <option value="pop">Pop</option>
+        <option value="rock">Rock</option>
+        <option value="electronic">Electronic</option>
+        <option value="ambient">Ambient</option>
+        <option value="ethnic/world">Ethnic/World</option>
+        <option value="hip hop">Hip Hop</option>
+        <option value="epic">Epic</option>
+      </select>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_music" placeholder="Selected or custom music (comma-separated)">
+    </div>
+  </div>
+
+  <!-- People / Characters -->
+  <div class="section">
+    <label>Add People / Characters</label>
+    <div id="characters-container"></div>
+    <div class="row" style="margin-top:8px;">
+      <button class="small" onclick="addCharacter()">Add Character</button>
+    </div>
+  </div>
+
+  <!-- Animals -->
+  <div class="section">
+    <label>Add Animals</label>
+    <div id="animals-container"></div>
+    <div class="row" style="margin-top:8px;">
+      <button class="small" onclick="addAnimal()">Add Animal</button>
+    </div>
+  </div>
+
+  <!-- Objects -->
+  <div class="section">
+    <label>Add Objects</label>
+    <div id="objects-container"></div>
+    <div class="row" style="margin-top:8px;">
+      <button class="small" onclick="addObject()">Add Object</button>
+    </div>
+  </div>
+
+  <!-- Generate and convert -->
+  <div class="row" style="margin-top:10px;">
+    <button id="generateBtn" onclick="generateJSON()">Generate JSON Prompt</button>
+    <button class="small secondary" onclick="convertJSONtoText()">Convert JSON → Text Prompt</button>
+    <button type="button" class="small secondary" onclick="clearAll()" id="clearButton">Clear All Fields</button>
+  </div>
+</form>
+
+<!-- Outputs -->
+<div style="margin-top:12px; display:grid; gap:12px;">
+  <div>
+    <label>Generated JSON (editable)</label>
+    <textarea id="output_json" class="output" placeholder="Generated JSON will appear here..." readonly></textarea>
+    <div class="row" style="margin-top:6px;">
+      <button class="small" onclick="copyJSON()">Copy JSON</button>
+      <button class="small" onclick="downloadJSON()">Download JSON</button>
+    </div>
+  </div>
+
+  <div>
+    <label>Plain Text Prompt (editable)</label>
+    <textarea id="output_text" class="output" placeholder="Plain text prompt will appear here..."></textarea>
+    <div class="row" style="margin-top:6px;">
+      <button class="small" onclick="copyTextPrompt()">Copy Text Prompt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========= State counters ========= */
+let characterCount = 0, animalCount = 0, objectCount = 0, customCatCount = 0;
+
+/* ========= Utility helpers ========= */
+function $(id){ return document.getElementById(id); }
+function appendToField(fieldId, value){
+  const f = $(fieldId); if(!f) return;
+  if(f.value) f.value += ', ' + value; else f.value = value;
+}
+function attachSelectByText(selectId, targetFieldId){
+  const sel = $(selectId); if(!sel) return;
+  sel.addEventListener('change', function(){
+    const idx = this.selectedIndex; if(idx>0){
+      const text = this.options[idx].text.trim();
+      if(text) appendToField(targetFieldId, text);
+      this.selectedIndex = 0;
+    }
+  });
+}
+
+/* ========= Characters ========= */
+function addCharacter(){
+  characterCount++;
+  const container = $('characters-container');
+  const div = document.createElement('div'); div.className='card'; div.id=`character-${characterCount}`;
+  div.innerHTML = `
+    <label>Person Type</label>
+    <select id="person_type_${characterCount}">
+      <option value="">Select...</option>
+      <option value="man">Man</option>
+      <option value="woman">Woman</option>
+      <option value="boy">Boy</option>
+      <option value="girl">Girl</option>
+    </select>
+    <label>Custom Person Type (if not listed)</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="person_custom_type_${characterCount}" placeholder="e.g., elderly fisherman"/>
+    <label>Character Description</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="person_description_${characterCount}" placeholder="e.g., tall man with a beard wearing a suit"/>
+    <label>Has Dialogue?</label>
+    <select id="has_dialogue_${characterCount}" onchange="toggleDialogue('character',${characterCount})">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+    <div id="dialogue-container-character-${characterCount}" style="display:none;margin-top:8px;">
+      <label>Dialogue</label>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="dialogue_${characterCount}" placeholder="Spoken lines..."/>
+    </div>
+    <div style="margin-top:8px;"><button class="small danger" onclick="removeElement('character',${characterCount})">Remove Character</button></div>
+  `;
+  container.appendChild(div);
+}
+function toggleDialogue(kind,id){
+  const sel = $(`has_dialogue_${id}`);
+  const container = $(`dialogue-container-${kind}-${id}`) || $(`dialogue-container-character-${id}`);
+  if(!container || !sel) return; container.style.display = sel.value==='yes' ? 'block':'none';
+}
+function removeElement(kind,id){ const el=$(kind+'-'+id); if(el) el.remove(); }
+
+/* ========= Animals (with dialogue) ========= */
+function addAnimal(){
+  animalCount++;
+  const container = $('animals-container');
+  const div = document.createElement('div'); div.className='card'; div.id=`animal-${animalCount}`;
+  div.innerHTML = `
+    <label>Animal Type</label>
+    <select id="animal_type_${animalCount}">
+      <option value="">Select...</option>
+      <option value="dog">Dog</option>
+      <option value="cat">Cat</option>
+      <option value="horse">Horse</option>
+      <option value="bird">Bird</option>
+      <option value="crow">Crow</option>
+      <option value="seagull">Seagull</option>
+      <option value="wolf">Wolf</option>
+      <option value="deer">Deer</option>
+      <option value="fox">Fox</option>
+      <option value="rabbit">Rabbit</option>
+      <option value="cow">Cow</option>
+      <option value="sheep">Sheep</option>
+      <option value="goat">Goat</option>
+      <option value="elephant">Elephant</option>
+      <option value="lion">Lion</option>
+      <option value="tiger">Tiger</option>
+      <option value="fish">Fish</option>
+      <option value="dolphin">Dolphin</option>
+      <option value="whale">Whale</option>
+      <option value="insect">Insect</option>
+      <option value="snake">Snake</option>
+      <option value="lizard">Lizard</option>
+    </select>
+    <label>Custom Animal Type (if not listed)</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="animal_custom_type_${animalCount}" placeholder="e.g., giant hawk-moth"/>
+    <label>Animal Description</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="animal_description_${animalCount}" placeholder="e.g., black dog with a red collar"/>
+    <label>Has Dialogue?</label>
+    <select id="has_animal_dialogue_${animalCount}" onchange="toggleAnimalDialogue(${animalCount})">
+      <option value="no">No</option><option value="yes">Yes</option>
+    </select>
+    <div id="dialogue-container-animal-${animalCount}" style="display:none;margin-top:8px;">
+      <label>Animal Dialogue</label>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="animal_dialogue_${animalCount}" placeholder="Spoken or vocalization..."/>
+    </div>
+    <div style="margin-top:8px;"><button class="small danger" onclick="removeElement('animal',${animalCount})">Remove Animal</button></div>
+  `;
+  container.appendChild(div);
+}
+function toggleAnimalDialogue(id){
+  const sel = $(`has_animal_dialogue_${id}`); const cont = $(`dialogue-container-animal-${id}`);
+  if(!cont||!sel) return; cont.style.display = sel.value==='yes'?'block':'none';
+}
+
+/* ========= Objects (with dialogue) ========= */
+function addObject(){
+  objectCount++;
+  const container = $('objects-container');
+  const div = document.createElement('div'); div.className='card'; div.id=`object-${objectCount}`;
+  div.innerHTML = `
+    <label>Object Type</label>
+    <select id="object_type_${objectCount}">
+      <option value="">Select...</option>
+      <option value="car">Car</option>
+      <option value="bicycle">Bicycle</option>
+      <option value="motorcycle">Motorcycle</option>
+      <option value="boat">Boat</option>
+      <option value="train">Train</option>
+      <option value="airplane">Airplane</option>
+      <option value="computer">Computer</option>
+      <option value="phone">Phone</option>
+      <option value="television">Television</option>
+      <option value="book">Book</option>
+      <option value="lamp">Lamp</option>
+      <option value="table">Table</option>
+      <option value="chair">Chair</option>
+      <option value="door">Door</option>
+      <option value="window">Window</option>
+      <option value="sign">Sign</option>
+      <option value="clock">Clock</option>
+      <option value="camera">Camera</option>
+      <option value="artifact">Artifact</option>
+    </select>
+    <label>Custom Object Type (if not listed)</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="object_custom_type_${objectCount}" placeholder="e.g., antique astrolabe"/>
+    <label>Object Description</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="object_description_${objectCount}" placeholder="e.g., rusty bicycle with a basket"/>
+    <label>Has Dialogue?</label>
+    <select id="has_object_dialogue_${objectCount}" onchange="toggleObjectDialogue(${objectCount})">
+      <option value="no">No</option><option value="yes">Yes</option>
+    </select>
+    <div id="dialogue-container-object-${objectCount}" style="display:none;margin-top:8px;">
+      <label>Object Dialogue / Text</label>
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="object_dialogue_${objectCount}" placeholder="e.g., sign text or voice"/>
+    </div>
+    <div style="margin-top:8px;"><button class="small danger" onclick="removeElement('object',${objectCount})">Remove Object</button></div>
+  `;
+  container.appendChild(div);
+}
+function toggleObjectDialogue(id){
+  const sel = $(`has_object_dialogue_${id}`); const cont = $(`dialogue-container-object-${id}`);
+  if(!cont||!sel) return; cont.style.display = sel.value==='yes'?'block':'none';
+}
+
+/* ========= Custom Categories ========= */
+function handleAddCustomCategory(){
+  const name = $('new_custom_name').value.trim();
+  const vals = $('new_custom_values').value.trim();
+  if(!name || !vals){ alert('enter category name and at least one value'); return; }
+  addCustomCategory(name, vals);
+  $('new_custom_name').value=''; $('new_custom_values').value='';
+}
+function addCustomCategory(name, vals){
+  customCatCount++;
+  const container = $('custom-categories-container');
+  const div = document.createElement('div'); div.className='card'; div.id=`custom-cat-${customCatCount}`;
+  div.innerHTML = `
+    <label>Category Name</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_name_${customCatCount}" value="${escapeHtml(name||'')}" placeholder="Category name (e.g., props)"/>
+    <label>Values (comma-separated)</label>
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="custom_values_${customCatCount}" value="${escapeHtml(vals||'')}" placeholder="value1, value2"/>
+    <div style="margin-top:8px;"><button class="small danger" onclick="removeCustomCategory(${customCatCount})">Remove Category</button></div>
+  `;
+  container.appendChild(div);
+}
+function removeCustomCategory(id){ const el=$(`custom-cat-${id}`); if(el) el.remove(); }
+function escapeHtml(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ========= Attach many selects so visible text is appended ========= */
+const attachPairs = [
+  ['setting','custom_setting'],
+  ['day_night','custom_daynight'],
+  ['part_of_day','custom_partofday'],
+  ['weather','custom_weather'],
+  ['effects','custom_effects'],
+  ['camera_movement','custom_camera_movement'],
+  ['camera_angle','custom_camera_angle'],
+  ['lens_type','custom_lens_type'],
+  ['aspect_ratio','custom_aspect_ratio'],
+  ['genre','custom_genre'],
+  ['style','custom_style'],
+  ['lighting','custom_lighting'],
+  ['mood','custom_mood'],
+  ['music','custom_music']
+];
+attachPairs.forEach(p=>attachSelectByText(p[0], p[1]));
+
+/* ========= Assemble JSON ========= */
+function getCategoryValues(id){
+  const el=$(id); if(!el) return []; const raw = el.value.trim(); return raw ? raw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+}
+function generateJSON(){
+  const prompt = {};
+  // scene
+  const setting = getCategoryValues('custom_setting'); const scene_description = $('scene_description').value.trim();
+  if(setting.length || scene_description){
+    prompt.scene = {};
+    if(setting.length) prompt.scene.location = setting.length===1?setting[0]:setting;
+    if(scene_description) prompt.scene.description = scene_description;
+  }
+  // environment
+  const env = {};
+  const daynight = getCategoryValues('custom_daynight'); if(daynight.length) env.time_of_day = daynight.length===1?daynight[0]:daynight;
+  const partofday = getCategoryValues('custom_partofday'); if(partofday.length) env.part_of_day = partofday.length===1?partofday[0]:partofday;
+  const weather = getCategoryValues('custom_weather'); if(weather.length) env.weather = weather.length===1?weather[0]:weather;
+  const effects = getCategoryValues('custom_effects'); if(effects.length) env.effects = effects.length===1?effects[0]:effects;
+  if(Object.keys(env).length) prompt.environment = env;
+  // shot
+  const shot = {};
+  const cammove = getCategoryValues('custom_camera_movement'); if(cammove.length) shot.camera_motion = cammove.length===1?cammove[0]:cammove;
+  const camangle = getCategoryValues('custom_camera_angle'); if(camangle.length) shot.camera_angle = camangle.length===1?camangle[0]:camangle;
+  const lens = getCategoryValues('custom_lens_type'); if(lens.length) shot.lens_type = lens.length===1?lens[0]:lens;
+  const aspect = getCategoryValues('custom_aspect_ratio'); if(aspect.length) shot.aspect_ratio = aspect.length===1?aspect[0]:aspect;
+  if(Object.keys(shot).length) prompt.shot = shot;
+  // cinematography
+  const cine = {};
+  const lighting = getCategoryValues('custom_lighting'); if(lighting.length) cine.lighting = lighting.length===1?lighting[0]:lighting;
+  const mood = getCategoryValues('custom_mood'); if(mood.length) cine.tone = mood.length===1?mood[0]:mood;
+  if(Object.keys(cine).length) prompt.cinematography = cine;
+  // sound
+  const music = getCategoryValues('custom_music'); if(music.length) prompt.sound = { music: music.length===1?music[0]:music };
+  // genre/style
+  const genre = getCategoryValues('custom_genre'); if(genre.length) prompt.genre = genre.length===1?genre[0]:genre;
+  const style = getCategoryValues('custom_style'); if(style.length) prompt.style = style.length===1?style[0]:style;
+  // characters
+  const characters = [];
+  document.querySelectorAll('.card[id^="character-"]').forEach(div=>{
+    const id = div.id.split('-')[1];
+    const typeSelect = $(`person_type_${id}`);
+    const customTypeEl = $(`person_custom_type_${id}`);
+    const desc = $(`person_description_${id}`);
+    if(!typeSelect || !desc || !customTypeEl) return;
+    const selectedType = (customTypeEl.value && customTypeEl.value.trim()) ? customTypeEl.value.trim() : (typeSelect.value || '').trim();
+    const has = $(`has_dialogue_${id}`) && $(`has_dialogue_${id}`).value==='yes';
+    const dialogue = has ? ($(`dialogue_${id}`).value.trim()||'') : '';
+    const obj={}; if(selectedType) obj.type=selectedType; if(desc.value.trim()) obj.description = desc.value.trim(); if(dialogue) obj.dialogue = dialogue;
+    if(Object.keys(obj).length) characters.push(obj);
+  });
+  if(characters.length) prompt.characters = characters;
+  // animals
+  const animals = [];
+  document.querySelectorAll('.card[id^="animal-"]').forEach(div=>{
+    const id = div.id.split('-')[1];
+    const typeSelect = $(`animal_type_${id}`);
+    const customTypeEl = $(`animal_custom_type_${id}`);
+    const desc = $(`animal_description_${id}`);
+    if(!typeSelect || !desc || !customTypeEl) return;
+    const selectedType = (customTypeEl.value && customTypeEl.value.trim()) ? customTypeEl.value.trim() : (typeSelect.value || '').trim();
+    const has = $(`has_animal_dialogue_${id}`) && $(`has_animal_dialogue_${id}`).value==='yes';
+    const dialogue = has ? ($(`animal_dialogue_${id}`).value.trim()||'') : '';
+    const a={}; if(selectedType) a.type=selectedType; if(desc.value.trim()) a.description = desc.value.trim(); if(dialogue) a.dialogue = dialogue;
+    if(Object.keys(a).length) animals.push(a);
+  });
+  if(animals.length) prompt.animals = animals;
+  // objects
+  const objects = [];
+  document.querySelectorAll('.card[id^="object-"]').forEach(div=>{
+    const id = div.id.split('-')[1];
+    const typeSelect = $(`object_type_${id}`);
+    const customTypeEl = $(`object_custom_type_${id}`);
+    const desc = $(`object_description_${id}`);
+    if(!typeSelect || !desc || !customTypeEl) return;
+    const selectedType = (customTypeEl.value && customTypeEl.value.trim()) ? customTypeEl.value.trim() : (typeSelect.value || '').trim();
+    const has = $(`has_object_dialogue_${id}`) && $(`has_object_dialogue_${id}`).value==='yes';
+    const dialogue = has ? ($(`object_dialogue_${id}`).value.trim()||'') : '';
+    const o={}; if(selectedType) o.type=selectedType; if(desc.value.trim()) o.description = desc.value.trim(); if(dialogue) o.dialogue = dialogue;
+    if(Object.keys(o).length) objects.push(o);
+  });
+  if(objects.length) prompt.objects = objects;
+  // custom categories
+  document.querySelectorAll('.card[id^="custom-cat-"]').forEach(div=>{
+    const id = div.id.split('-')[2];
+    const nameEl = $(`custom_name_${id}`); const valsEl = $(`custom_values_${id}`);
+    if(!nameEl||!valsEl) return;
+    const name = nameEl.value.trim(); const vals = valsEl.value.trim().split(',').map(s=>s.trim()).filter(Boolean);
+    if(name && vals.length) prompt[name] = vals.length===1?vals[0]:vals;
+  });
+
+  // write out
+  $('output_json').readOnly=false; $('output_json').value = JSON.stringify(prompt,null,2);
+  $('output_text').value = jsonToTextPrompt(prompt);
+  $('output_json').focus();
+}
+
+/* ========= Convert JSON to plain text ========= */
+function jsonToTextPrompt(obj){
+  if(!obj||typeof obj!=='object'||Object.keys(obj).length===0) return '';
+  const parts=[];
+  if(obj.scene){
+    if(obj.scene.location) parts.push(`Setting: ${Array.isArray(obj.scene.location)?obj.scene.location.join(', '):obj.scene.location}.`);
+    if(obj.scene.description) parts.push(`Scene: ${obj.scene.description}.`);
+  }
+  if(obj.environment){
+    const env=[]; if(obj.environment.time_of_day) env.push(`time: ${Array.isArray(obj.environment.time_of_day)?obj.environment.time_of_day.join(', '):obj.environment.time_of_day}`);
+    if(obj.environment.part_of_day) env.push(`part of day: ${Array.isArray(obj.environment.part_of_day)?obj.environment.part_of_day.join(', '):obj.environment.part_of_day}`);
+    if(obj.environment.weather) env.push(`weather: ${Array.isArray(obj.environment.weather)?obj.environment.weather.join(', '):obj.environment.weather}`);
+    if(obj.environment.effects) env.push(`effects: ${Array.isArray(obj.environment.effects)?obj.environment.effects.join(', '):obj.environment.effects}`);
+    if(env.length) parts.push(`Environment — ${env.join('; ')}.`);
+  }
+  if(obj.shot){
+    const s=[]; if(obj.shot.camera_motion) s.push(`camera movement: ${Array.isArray(obj.shot.camera_motion)?obj.shot.camera_motion.join(', '):obj.shot.camera_motion}`);
+    if(obj.shot.camera_angle) s.push(`camera angle: ${Array.isArray(obj.shot.camera_angle)?obj.shot.camera_angle.join(', '):obj.shot.camera_angle}`);
+    if(obj.shot.lens_type) s.push(`lens type: ${Array.isArray(obj.shot.lens_type)?obj.shot.lens_type.join(', '):obj.shot.lens_type}`);
+    if(obj.shot.aspect_ratio) s.push(`aspect ratio: ${Array.isArray(obj.shot.aspect_ratio)?obj.shot.aspect_ratio.join(', '):obj.shot.aspect_ratio}`);
+    if(s.length) parts.push(`Shot — ${s.join('; ')}.`);
+  }
+  if(obj.cinematography){
+    const c=[]; if(obj.cinematography.lighting) c.push(`lighting: ${Array.isArray(obj.cinematography.lighting)?obj.cinematography.lighting.join(', '):obj.cinematography.lighting}`);
+    if(obj.cinematography.tone) c.push(`tone: ${Array.isArray(obj.cinematography.tone)?obj.cinematography.tone.join(', '):obj.cinematography.tone}`);
+    if(c.length) parts.push(`Cinematography — ${c.join('; ')}.`);
+  }
+  if(obj.sound && obj.sound.music) parts.push(`Music: ${Array.isArray(obj.sound.music)?obj.sound.music.join(', '):obj.sound.music}.`);
+  if(obj.genre) parts.push(`Genre: ${Array.isArray(obj.genre)?obj.genre.join(', '):obj.genre}.`);
+  if(obj.style) parts.push(`Style: ${Array.isArray(obj.style)?obj.style.join(', '):obj.style}.`);
+  if(obj.characters) obj.characters.forEach((c,i)=>{ const arr=[]; if(c.type) arr.push(c.type); if(c.description) arr.push(c.description); if(c.dialogue) arr.push(`dialogue: "${c.dialogue}"`); parts.push(`Character ${i+1}: ${arr.join(' — ')}.`); });
+  if(obj.animals) obj.animals.forEach((a,i)=>{ const arr=[]; if(a.type) arr.push(a.type); if(a.description) arr.push(a.description); if(a.dialogue) arr.push(`dialogue: "${a.dialogue}"`); parts.push(`Animal ${i+1}: ${arr.join(' — ')}.`); });
+  if(obj.objects) obj.objects.forEach((o,i)=>{ const arr=[]; if(o.type) arr.push(o.type); if(o.description) arr.push(o.description); if(o.dialogue) arr.push(`text/dialogue: "${o.dialogue}"`); parts.push(`Object ${i+1}: ${arr.join(' — ')}.`); });
+  // extras
+  Object.keys(obj).forEach(k=>{ if(['scene','environment','shot','cinematography','sound','genre','style','characters','animals','objects'].includes(k)) return; const v=obj[k]; parts.push(`${k}: ${Array.isArray(v)?v.join(', '):v}.`); });
+  return parts.join(' ');
+}
+
+function convertJSONtoText(){
+  try{
+    const j = JSON.parse($('output_json').value || '{}');
+    $('output_text').value = jsonToTextPrompt(j);
+  } catch(e){ alert('Invalid JSON in output area. Generate valid JSON first.'); }
+}
+
+/* ========= Copy / Download ========= */
+function copyJSON(){ navigator.clipboard.writeText($('output_json').value).then(()=>alert('JSON copied'),()=>alert('Copy failed')); }
+function copyTextPrompt(){ navigator.clipboard.writeText($('output_text').value).then(()=>alert('Text copied'),()=>alert('Copy failed')); }
+function downloadJSON(){ const blob = new Blob([$('output_json').value],{type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='veo_prompt.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+/* ========= Presets (editable inline) ========= */
+const PRESET_KEY = 'veo_env_presets_v2';
+function readPresets(){ try{ const raw = localStorage.getItem(PRESET_KEY); return raw ? JSON.parse(raw) : []; }catch(e){ return []; } }
+function writePresets(pres){ localStorage.setItem(PRESET_KEY, JSON.stringify(pres)); renderPresets(); }
+/* initDefaultPresets no longer seeds pre-made presets — user requested removal of pre-made presets */
+function initDefaultPresets(){
+  renderPresets();
+}
+function renderPresets(){
+  const container = $('presetsContainer'); container.innerHTML = '';
+  const presets = readPresets();
+  presets.forEach((p, idx)=>{
+    const item = document.createElement('div'); item.className='preset-item'; item.id=`preset-item-${idx}`;
+    const meta = document.createElement('div'); meta.className='meta';
+    meta.innerHTML = `
+      <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_name_${idx}" value="${escapeHtml(p.name)}" style="font-weight:700;" />
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_setting_${idx}" placeholder="custom_setting" value="${escapeHtml(p.fields.custom_setting||'')}" />
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_daynight_${idx}" placeholder="custom_daynight" value="${escapeHtml(p.fields.custom_daynight||'')}" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_partofday_${idx}" placeholder="custom_partofday" value="${escapeHtml(p.fields.custom_partofday||'')}" />
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_weather_${idx}" placeholder="custom_weather" value="${escapeHtml(p.fields.custom_weather||'')}" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_effects_${idx}" placeholder="custom_effects" value="${escapeHtml(p.fields.custom_effects||'')}" />
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_lighting_${idx}" placeholder="custom_lighting" value="${escapeHtml(p.fields.custom_lighting||'')}" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_mood_${idx}" placeholder="custom_mood" value="${escapeHtml(p.fields.custom_mood||'')}" />
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_lens_type_${idx}" placeholder="custom_lens_type" value="${escapeHtml(p.fields.custom_lens_type||'')}" />
+      </div>
+      <div style="margin-top:6px;">
+        <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" id="preset_field_custom_aspect_ratio_${idx}" placeholder="custom_aspect_ratio" value="${escapeHtml(p.fields.custom_aspect_ratio||'')}" />
+      </div>
+    `;
+    const controls = document.createElement('div'); controls.className='btn-row';
+    controls.innerHTML = `
+      <button class="small" onclick="applyPreset(${idx})">Apply</button>
+      <button class="small" onclick="savePresetEdits(${idx})">Save Edits</button>
+      <button class="small secondary" onclick="duplicatePreset(${idx})">Duplicate</button>
+      <button class="small danger" onclick="deletePreset(${idx})">Delete</button>
+    `;
+    item.appendChild(meta); item.appendChild(controls); container.appendChild(item);
+  });
+}
+
+/* Save current environment as a new preset */
+function savePresetAsNew(){
+  const name = $('new_preset_name').value.trim(); if(!name){ alert('Enter a preset name'); return; }
+  const fields = {
+    custom_setting: $('custom_setting').value.trim(),
+    custom_daynight: $('custom_daynight').value.trim(),
+    custom_partofday: $('custom_partofday').value.trim(),
+    custom_weather: $('custom_weather').value.trim(),
+    custom_effects: $('custom_effects').value.trim(),
+    custom_lighting: $('custom_lighting').value.trim(),
+    custom_mood: $('custom_mood').value.trim(),
+    custom_lens_type: $('custom_lens_type').value.trim(),
+    custom_aspect_ratio: $('custom_aspect_ratio').value.trim()
+  };
+  const presets = readPresets(); presets.push({ name, fields }); writePresets(presets);
+  $('new_preset_name').value=''; alert('Preset saved');
+}
+
+/* Inline apply a preset by index */
+function applyPreset(index){
+  const presets = readPresets(); const p = presets[index]; if(!p) return;
+  const f = p.fields || {};
+  ['custom_setting','custom_daynight','custom_partofday','custom_weather','custom_effects','custom_lighting','custom_mood','custom_lens_type','custom_aspect_ratio'].forEach(k=>{
+    $(k).value = f[k]||'';
+  });
+  alert(`Applied preset: ${p.name}`);
+}
+
+/* Save the edits made directly in the preset card */
+function savePresetEdits(index){
+  const presets = readPresets(); if(!presets[index]) return;
+  const newName = $(`preset_name_${index}`).value.trim(); if(!newName){ alert('Preset name required'); return; }
+  const fields = {
+    custom_setting: $(`preset_field_custom_setting_${index}`).value.trim(),
+    custom_daynight: $(`preset_field_custom_daynight_${index}`).value.trim(),
+    custom_partofday: $(`preset_field_custom_partofday_${index}`).value.trim(),
+    custom_weather: $(`preset_field_custom_weather_${index}`).value.trim(),
+    custom_effects: $(`preset_field_custom_effects_${index}`).value.trim(),
+    custom_lighting: $(`preset_field_custom_lighting_${index}`).value.trim(),
+    custom_mood: $(`preset_field_custom_mood_${index}`).value.trim(),
+    custom_lens_type: $(`preset_field_custom_lens_type_${index}`).value.trim(),
+    custom_aspect_ratio: $(`preset_field_custom_aspect_ratio_${index}`).value.trim()
+  };
+  presets[index].name = newName; presets[index].fields = fields; writePresets(presets);
+  alert('Preset updated');
+}
+
+/* Duplicate a preset */
+function duplicatePreset(index){
+  const presets = readPresets(); if(!presets[index]) return;
+  const copy = JSON.parse(JSON.stringify(presets[index])); copy.name = presets[index].name + ' (copy)';
+  presets.push(copy); writePresets(presets);
+  alert('Preset duplicated');
+}
+
+/* Delete */
+function deletePreset(index){
+  const presets = readPresets(); if(!presets[index]) return;
+  if(!confirm(`Delete preset "${presets[index].name}"?`)) return;
+  presets.splice(index,1); writePresets(presets);
+  alert('Deleted');
+}
+
+function clearAll() {
+  if (!confirm('Clear all text fields and dynamic entries to defaults? This will NOT delete saved presets.')) return;
+
+  // reset all selects to placeholder (index 0)
+  document.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
+
+  // clear all text inputs and textareas EXCEPT those inside the presets manager
+  document.querySelectorAll('input[type="text"], textarea').forEach(el => {
+    // skip inputs inside the inline preset editor so you don't wipe preset edits
+    if (el.closest && el.closest('#presetsContainer')) return;
+    el.value = '';
+  });
+
+  // reset dynamic containers and counters
+  const dynamicIds = ['characters-container','animals-container','objects-container','custom-categories-container'];
+  dynamicIds.forEach(id => {
+    const cont = document.getElementById(id);
+    if (cont) cont.innerHTML = '';
+  });
+
+  // reset counters (these are the globals used by addCharacter/addAnimal/addObject)
+  if (typeof characterCount !== 'undefined') characterCount = 0;
+  if (typeof animalCount !== 'undefined') animalCount = 0;
+  if (typeof objectCount !== 'undefined') objectCount = 0;
+  if (typeof customCatCount !== 'undefined') customCatCount = 0;
+
+  // recreate initial sections (if you want none initially, remove these)
+  if (typeof addCharacter === 'function') addCharacter();
+  if (typeof addAnimal === 'function') addAnimal();
+  if (typeof addObject === 'function') addObject();
+
+  // clear outputs
+  const outJson = document.getElementById('output_json');
+  const outText = document.getElementById('output_text');
+  if (outJson) { outJson.value = ''; outJson.readOnly = true; }
+  if (outText) outText.value = '';
+
+  // clear 'new preset' and 'new custom' inputs (but keep saved presets)
+  const extras = ['new_preset_name','new_custom_name','new_custom_values'];
+  extras.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+
+  // scroll top and notify
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  alert('Cleared form fields to defaults. Saved presets are preserved.');
+}
+
+
+/* ========= Init ========= */
+function init(){
+  initDefaultPresets();
+  // initial content
+  addCharacter(); addAnimal(); addObject();
+  // attach selects (already attached above)
+}
+init();
+
+/* Theme toggle */
+$('theme-toggle').addEventListener('click', function(){
+  document.body.classList.toggle('dark-mode');
+  this.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+});
+</script>
+</body>
+</html>
