@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Advanced JSON Prompt Builder — Full Options + Editable Presets</title>
+<title>Advanced JSON Prompt Builder</title>
 <style>
   :root{
     --bg:#f0f4f8; --fg:#111; --accent:#007bff; --card:#fff; --muted:#666; --green:#28a745;
@@ -52,8 +52,9 @@ body.dark-mode .preset-item{
 <body class="dark-mode">
 <button id="theme-toggle">Toggle Light Mode</button>
 <h1>Advanced JSON Prompt Builder</h1>
-<h1>by Rob Servidone</h1>
-<p>All categories restored. Edit presets inline, add custom categories, animals, objects, then generate JSON or convert to text.</p>
+<h1>for AI Video Generation</h1>
+<h2>by Rob Servidone</h2>
+<p>Describe the scene you wish to generate in the forms below. If left blank, category will be omitted from JSON output. Edit presets inline, add custom categories, animals, objects, then generate JSON or convert to text.</p>
 
 <!-- Turn off browser autofill / past-input popups -->
 <form id="promptForm" onsubmit="return false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -1055,3 +1056,4 @@ $('theme-toggle').addEventListener('click', function(){
 </script>
 </body>
 </html>
+
